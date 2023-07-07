@@ -1,4 +1,4 @@
-package eu.kwrhannover.jufo.metag;
+package eu.kwrhannover.jufo.alethieg;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -14,11 +14,15 @@ public class Result {
     private final Path sourceFile;
     private final DiagnosticFinding analysisResult;
     private final double analysisValue;
+    // stores the probablility that the species is positive
+    private final double positiveProbability;
 
-    public Result(Path sourceFile, DiagnosticFinding analysisResult, double analysisValue) {
+    public Result(Path sourceFile, DiagnosticFinding analysisResult, double analysisValue, double positiveProbability) {
         this.sourceFile = sourceFile;
         this.analysisResult = analysisResult;
         this.analysisValue = analysisValue;
+        
+        this.positiveProbability = positiveProbability;
     }
 
     public Path getSourceFile() {
@@ -33,12 +37,17 @@ public class Result {
         return analysisValue;
     }
 
+    public double getPositiveProbability(){
+        return positiveProbability;
+    }
+
     @Override
     public String toString() {
         return "Result{" +
                 "sourceFile=" + sourceFile +
                 ", analysisResult=" + analysisResult +
                 ", analysisValue=" + analysisValue +
+                ", positiveProbability=" + positiveProbability +
                 '}';
     }
 

@@ -1,4 +1,4 @@
-package eu.kwrhannover.jufo.metag;
+package eu.kwrhannover.jufo.alethieg;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +11,9 @@ import java.util.Properties;
 
 public enum Settings {
 
-    MetaGSettings;
+    AlethieGSettings;
 
-    private static final Path path = Paths.get("MetaG.properties").toAbsolutePath().normalize();
+    private static final Path path = Paths.get("AlethieG.properties").toAbsolutePath().normalize();
 
     private final Properties properties = Defaults.get();
 
@@ -27,12 +27,12 @@ public enum Settings {
     }
 
     public static class Defaults {
-        static final Path DIRECTORY = Paths.get(System.getProperty("user.home", "."));
-        static final boolean BROWSE_SUBFOLDERS = true;
+        static final Path DIRECTORY = Paths.get("/mnt/ngsnfs/gen/rcug_lw/Janno/WochenendeMetaG/playground_new/growth_rate");  //System.getProperty("user.home", ".") TODO: change back
+        static final boolean BROWSE_SUBFOLDERS = false;
         static final int BAR_COUNT = 50;
         static final int MAX_POSITIONS = 10000;
-        static final int GRAPH_SCALE = 1;
-        static final boolean SVG_OUTPUT = false;
+        static final int GRAPH_SCALE = 5;
+        static final boolean SVG_OUTPUT = true;
 
         private static Properties get() {
             final Properties properties = new Properties();
@@ -62,7 +62,7 @@ public enum Settings {
 
     private void saveProperties() {
         try (OutputStream out = Files.newOutputStream(path)) {
-            properties.store(out, "MetaG.properties");
+            properties.store(out, "AlethieG.properties");
         } catch (IOException e) {
             System.out.println("Properties " + path + " couldn't be saved - " + e);
         }

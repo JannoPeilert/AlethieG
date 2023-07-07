@@ -1,19 +1,21 @@
-package eu.kwrhannover.jufo.metag;
+package eu.kwrhannover.jufo.alethieg;
 
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static eu.kwrhannover.jufo.metag.Analysis.*;
-import static eu.kwrhannover.jufo.metag.CreateSVG.createTargetFilename;
-import static eu.kwrhannover.jufo.metag.CreateSVG.writeSVG;
-import static eu.kwrhannover.jufo.metag.ParseCSV.parseCSV;
-import static eu.kwrhannover.jufo.metag.Settings.MetaGSettings;
+import static eu.kwrhannover.jufo.alethieg.Analysis.*;
+import static eu.kwrhannover.jufo.alethieg.CreateSVG.createTargetFilename;
+import static eu.kwrhannover.jufo.alethieg.CreateSVG.writeSVG;
+import static eu.kwrhannover.jufo.alethieg.ParseCSV.parseCSV;
+import static eu.kwrhannover.jufo.alethieg.Settings.AlethieGSettings;
 import static java.lang.System.lineSeparator;
 import static java.lang.System.out;
 import static java.nio.file.Files.deleteIfExists;
@@ -21,30 +23,36 @@ import static java.nio.file.Files.isRegularFile;
 import static java.util.Locale.ROOT;
 import static java.util.stream.Collectors.joining;
 
-public class MetaG {
-    private static Path path = MetaGSettings.getDirectory();
-    public static int maxPositions = MetaGSettings.getMaxPositions(); //Maximum number of positions
-    public static int barCount = MetaGSettings.getBarCount(); //Number of bars
-    public static int scale = MetaGSettings.getGraphScale(); //(scale / 100) must be divisible by 5 (not relevant in GUI with slider) //TODO dynamic y-axis labeling
-    private static boolean browseSubfolders = MetaGSettings.getBrowseSubfolders();
+public class AlethieG {
+    private static Path path = AlethieGSettings.getDirectory();
+    public static int maxPositions = AlethieGSettings.getMaxPositions(); //Maximum number of positions
+    public static int barCount = AlethieGSettings.getBarCount(); //Number of bars
+    public static int scale = AlethieGSettings.getGraphScale(); //(scale / 100) must be divisible by 5 (not relevant in GUI with slider) //TODO dynamic y-axis labeling
+    private static boolean browseSubfolders = AlethieGSettings.getBrowseSubfolders();
 
     public static void main(String[] args) throws IOException {
 
-        MetaG metaG = new MetaG();
+        AlethieG alethieg = new AlethieG();
 
-        metaG.execute(progress -> {
+        alethieg.execute(progress -> {
         });
     }
 
     public void execute(final Consumer<Double> updateProgress) throws IOException {
         System.out.println("Start ...");
 
-        path = MetaGSettings.getDirectory();
-        boolean svgOutput = MetaGSettings.getSVGOutput();
-        maxPositions = MetaGSettings.getMaxPositions();
-        barCount = MetaGSettings.getBarCount();
-        scale = MetaGSettings.getGraphScale();
-        browseSubfolders = MetaGSettings.getBrowseSubfolders();
+        //prints java version
+        double version = Double.parseDouble(System.getProperty("java.specification.version"));
+        System.out.println("Java version: " + version);
+
+        path = AlethieGSettings.getDirectory();
+        System.out.println("Path: " + path);
+
+        boolean svgOutput = AlethieGSettings.getSVGOutput();
+        maxPositions = AlethieGSettings.getMaxPositions();
+        barCount = AlethieGSettings.getBarCount();
+        scale = AlethieGSettings.getGraphScale();
+        browseSubfolders = AlethieGSettings.getBrowseSubfolders();
 
         List<Path> paths = getPaths();
 
@@ -90,9 +98,9 @@ public class MetaG {
             out.println("No CSV files found");
         } else {
             if (results.size() == 1) {
-                analysisFile = Path.of(MetaGSettings.getDirectory() + "\\_MetaG_" + cutFileExtension(results.get(0).getSourceFile().getFileName()) + "_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
+                analysisFile = Paths.get(AlethieGSettings.getDirectory() + File.separator + "AlethieG_" + cutFileExtension(results.get(0).getSourceFile().getFileName()) + "_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
             } else {
-                analysisFile = Path.of(MetaGSettings.getDirectory() + "\\_MetaG_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
+                analysisFile = Paths.get(AlethieGSettings.getDirectory() + File.separator + "AlethieG_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
             }
             deleteFile(analysisFile);
             Analysis.createAnalysisFile(results, analysisFile);
@@ -112,7 +120,7 @@ public class MetaG {
         ArrayList<Path> paths = new ArrayList<>();
         try {
             if (Files.exists(path) && Files.isReadable(path)) {
-                MetaGSettings.setDirectory(path);
+                AlethieGSettings.setDirectory(path);
                 if (isRegularFile(path)) {
                     paths.add(path);
                     return paths;

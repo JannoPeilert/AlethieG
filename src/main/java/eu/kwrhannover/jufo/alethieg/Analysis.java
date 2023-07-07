@@ -1,4 +1,4 @@
-package eu.kwrhannover.jufo.metag;
+package eu.kwrhannover.jufo.alethieg;
 
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
@@ -8,98 +8,87 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.lang.Math;
 
-import static eu.kwrhannover.jufo.metag.MetaG.barCount;
-import static eu.kwrhannover.jufo.metag.Result.DiagnosticFinding.*;
+import static eu.kwrhannover.jufo.alethieg.AlethieG.barCount;
+import static eu.kwrhannover.jufo.alethieg.Result.DiagnosticFinding.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class Analysis {
 
     private final Path sourceFile;
+    private double o, u, k, o_2, u_2, k_2, j_2, m_2 = 0.0;
 
     public Analysis(Path sourceFile) {
         this.sourceFile = sourceFile;
     }
 
-    private Result resultOf(Result.DiagnosticFinding diagnosticFinding, double analysis) {
-        return new Result(sourceFile, diagnosticFinding, analysis);
+    private Result resultOf(Result.DiagnosticFinding diagnosticFinding, double analysis, double positiveProbability) {
+        return new Result(sourceFile, diagnosticFinding, analysis, positiveProbability);
     }
 
+    // main resul calculation: calculation of result score
     public Result analyseDistances(DoubleArrayList scaledBars) {
+        System.out.println(scaledBars);
         double analyse = 0;
         for (int i = 0; i < (scaledBars.size() - 1); ++i) {
-            analyse += ((scaledBars.get(i)) - (scaledBars.get(i + 1)));
+            analyse += (Math.pow((scaledBars.get(i)) - (scaledBars.get(i + 1)), 2));
+            System.out.println(analyse);
         }
         // Die Analyse wird für folgende Säulenanzahlen / res unterstützt: 5, 10, 15, 20, 30, 40, 50
         // Dies liegt daran, dass die Grenzwerte der Analysewerte per Hand ermittelt werden und damit auch nur vorhergesehene Fälle analysiert werden können.
         // Man könnte an dieser Stelle einen Kalibrierungsalgorithmus einbringen, der immer Grenzwerte für fremde Anzahlen an Säulen festlegt.
         // Bei einer solchen Anwendung ist, anders als gewohnt, nicht mit zügigen Ergebnissen zu rechnen.
         switch (barCount) {
-            case 5:
-                if (analyse <= 11.6) {
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 58.9) {
-                    return resultOf(NEGATIVE, analyse);
-                } else {
-                    return resultOf(UNKNOWN, analyse);
-                }
-            case 10:
-                if (analyse <= 7.9) {
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 34.9) {
-                    return resultOf(NEGATIVE, analyse);
-                } else {
-                    return resultOf(UNKNOWN, analyse);
-                }
-            case 15:
-                if (analyse <= 6.8) { //6.7+
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 24.8) {
-                    return resultOf(NEGATIVE, analyse);
-                } else {
-                    return resultOf(UNKNOWN, analyse);
-                }
-            case 20:
-                if (analyse <= 5.8) {
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 19.2) {
-                    return resultOf(NEGATIVE, analyse);
-                } else {
-                    return resultOf(UNKNOWN, analyse);
-                }
-            case 30:
-                if (analyse <= 4.5) { //4.4+
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 13) {
-                    return resultOf(NEGATIVE, analyse);
-                } else {
-                    return resultOf(UNKNOWN, analyse);
-                }
-            case 40:
-                if (analyse <= 3.9) { //3.8+
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 9.9) {
-                    return resultOf(NEGATIVE, analyse);
-                } else {
-                    return resultOf(UNKNOWN, analyse);
-                }
             case 50:
-                if (analyse <= 3.6) {
-                    return resultOf(POSITIVE, analyse);
-                } else if (analyse >= 8) {
-                    return resultOf(NEGATIVE, analyse);
+                //parameters were detaimined empirical
+                //sets parameter for positive curve
+                 o = 1.89;
+                 u = -1.25;
+                 k = 4.7;
+                //sets parameter for negative curve
+                 o_2 = 0.5;
+                 u_2 = 1.9;
+                 k_2 = 3;
+                 j_2 = 0.01;
+                 m_2 = 4;
+
+                //calculates the chance, that species is positive
+                double positiveProbability = 1/(positiveCurve(analyse)+negativeCurve(analyse))*positiveCurve(analyse);
+                
+                //based on chance detaimine whether the sample is positive, negative or unknown
+                if (positiveProbability >= 0.65) {
+                    return resultOf(POSITIVE, analyse, positiveProbability);
+                } else if (positiveProbability <= 0.35) {
+                    return resultOf(NEGATIVE, analyse, positiveProbability);
                 } else {
-                    return resultOf(UNKNOWN, analyse);
+                    return resultOf(UNKNOWN, analyse, positiveProbability);
                 }
         }
-        throw new UnsupportedOperationException("Diagnostic finding only works with 10, 20 and 50 bars");
+        throw new UnsupportedOperationException("Diagnostic finding only works with 50 bars");
+    }
+
+    
+
+
+    private double negativeCurve(double analyse) {
+        if(analyse <= -m_2){
+            return j_2;
+        } else {
+            return 1 / (Math.sqrt(2*Math.PI) * o_2 * (analyse + m_2)) * Math.exp((-Math.pow(Math.log(analyse + m_2) - u_2, 2)) / (Math.pow(o_2, 2) * 2)) * k_2 + j_2;
+
+        }
+    }
+
+    private double positiveCurve(double analyse) {
+        return Math.exp(((-Math.pow((analyse - u) / o, 2)) / 2)) / (Math.sqrt(2*Math.PI)*Math.abs(o)) * k;
     }
 
     public static void createAnalysisFile(List<Result> results, Path targetAnalysisFile) {
 
         try (BufferedWriter analysisWriter = Files.newBufferedWriter(targetAnalysisFile, UTF_8)) {
             for (Result result : results) {
-                analysisWriter.write(result.getSourceFile() + "\t" + result.getAnalysisResult() + "\t" + result.getAnalysisValue() + System.lineSeparator());
+                analysisWriter.write(result.getSourceFile() + "\t" + result.getAnalysisResult() + "\t" + result.getAnalysisValue() + "\t" + result.getPositiveProbability() + System.lineSeparator());
             }
         } catch (IOException e) {
             e.printStackTrace();

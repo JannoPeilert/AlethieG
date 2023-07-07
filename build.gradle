@@ -2,12 +2,11 @@ plugins {
     id 'java'
     id 'application'
     id 'org.javamodularity.moduleplugin' version '1.8.10'
-    id 'org.openjfx.javafxplugin' version '0.0.10'
     id 'org.beryx.jlink' version '2.24.1'
 }
 
 group 'eu.kwr-hannover.jufo'
-version '2022.1.0'
+version '2023.2.0'
 
 repositories {
     mavenCentral()
@@ -17,22 +16,17 @@ ext {
     junitVersion = '5.8.2'
 }
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 application {
-    mainModule = 'eu.kwrhannover.jufo.metag'
-    mainClass = 'eu.kwrhannover.jufo.metag.MetaGApplication'
+    mainModule = 'eu.kwrhannover.jufo.alethieg'
+    mainClass = 'eu.kwrhannover.jufo.alethieg.AlethieG'
 }
 
-javafx {
-    version = '17.0.1'
-    modules = ['javafx.controls', 'javafx.fxml']
-}
 
 dependencies {
     implementation 'colt:colt:1.2.0'
@@ -46,10 +40,14 @@ test {
 }
 
 jlink {
-    imageZip = project.file("${buildDir}/distributions/${name}-${version}-${javafx.platform.classifier}.zip")
+    imageZip = project.file("${buildDir}/distributions/${name}-${version}.zip")
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
 }
 
 jlinkZip {
     group = 'distribution'
+}
+
+compileJava {
+    options.release = 10
 }
