@@ -67,6 +67,7 @@ public class AlethieG {
             if (check) {
                 try {
                     final DoubleArrayList positions = parseCSV(path);
+                    System.out.println(positions.size());
 
                     final long distanceCount = ((long) positions.size() * (positions.size() - 1)) / 2;
 

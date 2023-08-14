@@ -1,5 +1,6 @@
 package eu.kwrhannover.jufo.alethieg;
 
+import cern.colt.Arrays;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.LongArrayList;
 
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.lang.Math;
+import java.lang.reflect.Array;
 
 import static eu.kwrhannover.jufo.alethieg.AlethieG.barCount;
 import static eu.kwrhannover.jufo.alethieg.Result.DiagnosticFinding.*;
@@ -29,11 +31,11 @@ public final class Analysis {
 
     // main resul calculation: calculation of result score
     public Result analyseDistances(DoubleArrayList scaledBars) {
-        System.out.println(scaledBars);
+        //System.out.println(scaledBars);
         double analyse = 0;
         for (int i = 0; i < (scaledBars.size() - 1); ++i) {
-            analyse += (Math.pow((scaledBars.get(i)) - (scaledBars.get(i + 1)), 2));
-            System.out.println(analyse);
+            analyse += (Math.abs((scaledBars.get(i)) - (scaledBars.get(i + 1))));        //analyse += (Math.pow((scaledBars.get(i)) - (scaledBars.get(i + 1)), 2));
+        //    System.out.println(analyse);
         }
         // Die Analyse wird für folgende Säulenanzahlen / res unterstützt: 5, 10, 15, 20, 30, 40, 50
         // Dies liegt daran, dass die Grenzwerte der Analysewerte per Hand ermittelt werden und damit auch nur vorhergesehene Fälle analysiert werden können.
@@ -103,6 +105,7 @@ public final class Analysis {
             d = bars.get(i) * p100;
             scaledBars[i] = d;
         }
+        System.out.println(java.util.Arrays.toString(scaledBars));
         return new DoubleArrayList(scaledBars);
     }
 
@@ -162,6 +165,7 @@ public final class Analysis {
                 ++distanceIntervals[intervalIndex];
             }
         }
+        //System.out.println(Arrays.toString(distanceIntervals));
         return new LongArrayList(distanceIntervals);
     }
 
