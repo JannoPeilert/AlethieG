@@ -1,6 +1,7 @@
-# MetaG
+# AlethieG
+Adaption of [`MetaG`](https://github.com/dluxe0/MetaG). Used for implementatin in [`Wochenende`](https://github.com/JannoPeilert/WochenendeMetaG).
 
-False-positive results occur in digital metagenomic sequencing of bacteria. **MetaG** significantly reduces these and optionally outputs analysis charts as Scalable Vector Graphics.
+False-positive results occur in digital metagenomic sequencing of bacteria. **Alethie** significantly reduces these and optionally outputs analysis charts as Scalable Vector Graphics.
 
 ## Get the app
 
@@ -46,7 +47,7 @@ In order to achieve the best possible results, you can change settings for how M
 |-------------------|--------------------------------------------------------|-----------------------------------------------------|
 | DIRECTORY         | Path for databases                                     | use `\\` or `/` for folders                         |
 | BROWSE_SUBFOLDERS | Whether or not subfolders should be searched for files | `true` or `false`                                   |
-| BAR_COUNT         | Quantity of columns in the diagram                     | `10` - `50`                                         |
+| BAR_COUNT         | Quantity of columns in the diagram                     | `50`                                                |
 | MAX_POSITIONS     | Upper limit of reads to process                        | at least `1000`, recommended `10000`                |
 | GRAPH_SCALE       | Scale of the diagram                                   | `1`,`2`,`5`,`10`,`20` other scaling is experimental |
 | SVG_OUTPUT        | Whether or not to create `.svg` output files           | `true` or `false`                                   |
