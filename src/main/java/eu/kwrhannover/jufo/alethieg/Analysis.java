@@ -16,15 +16,17 @@ import static eu.kwrhannover.jufo.alethieg.AlethieG.barCount;
 import static eu.kwrhannover.jufo.alethieg.Result.DiagnosticFinding.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+// class for calculation
 public final class Analysis {
 
     private final Path sourceFile;
-    private double o, u, k, o_2, u_2, k_2, j_2, m_2 = 0.0;
+    private double o, u, k, o_2, u_2, k_2, j_2, m_2 = 0.0;  // variables for function to calculate probability
 
     public Analysis(Path sourceFile) {
         this.sourceFile = sourceFile;
     }
 
+    // method for exporting resultobject
     private Result resultOf(Result.DiagnosticFinding diagnosticFinding, double analysis, double positiveProbability) {
         return new Result(sourceFile, diagnosticFinding, analysis, positiveProbability);
     }
@@ -32,18 +34,18 @@ public final class Analysis {
     // main resul calculation: calculation of result score
     public Result analyseDistances(DoubleArrayList scaledBars) {
         //System.out.println(scaledBars);
-        double analyse = 0;
+        double analyse = 0; // analysis score, is basically the sum of differences, idea: the greater the differences between bars, the unliklier the existence of that species
         for (int i = 0; i < (scaledBars.size() - 1); ++i) {
             analyse += (Math.abs((scaledBars.get(i)) - (scaledBars.get(i + 1))));        //analyse += (Math.pow((scaledBars.get(i)) - (scaledBars.get(i + 1)), 2));
         //    System.out.println(analyse);
         }
-        // Die Analyse wird für folgende Säulenanzahlen / res unterstützt: 5, 10, 15, 20, 30, 40, 50
-        // Dies liegt daran, dass die Grenzwerte der Analysewerte per Hand ermittelt werden und damit auch nur vorhergesehene Fälle analysiert werden können.
+        // Die Analyse wird für folgende Säulenanzahlen / res unterstützt: 50
+        // Dies liegt (ursprünglich) daran, dass die Grenzwerte der Analysewerte per Hand ermittelt wurden (vor 2023.02) und damit auch nur vorhergesehene Fälle analysiert werden können.
         // Man könnte an dieser Stelle einen Kalibrierungsalgorithmus einbringen, der immer Grenzwerte für fremde Anzahlen an Säulen festlegt.
         // Bei einer solchen Anwendung ist, anders als gewohnt, nicht mit zügigen Ergebnissen zu rechnen.
         switch (barCount) {
             case 50:
-                //parameters were detaimined empirical
+                //parameters were detaimined empirical based on a density function. Parameters can be changed easier
                 //sets parameter for positive curve
                  o = 1.89;
                  u = -1.25;
@@ -58,7 +60,7 @@ public final class Analysis {
                 //calculates the chance, that species is positive
                 double positiveProbability = 1/(positiveCurve(analyse)+negativeCurve(analyse))*positiveCurve(analyse);
                 
-                //based on chance detaimine whether the sample is positive, negative or unknown
+                //based on chance detaimine whether the sample is positive, negative or unknown, cutoff was set arbitrarily
                 if (positiveProbability >= 0.65) {
                     return resultOf(POSITIVE, analyse, positiveProbability);
                 } else if (positiveProbability <= 0.35) {
@@ -86,9 +88,11 @@ public final class Analysis {
         return Math.exp(((-Math.pow((analyse - u) / o, 2)) / 2)) / (Math.sqrt(2*Math.PI)*Math.abs(o)) * k;
     }
 
+    //writes result in a tab-separated file
     public static void createAnalysisFile(List<Result> results, Path targetAnalysisFile) {
 
         try (BufferedWriter analysisWriter = Files.newBufferedWriter(targetAnalysisFile, UTF_8)) {
+            // TODO: add header
             for (Result result : results) {
                 analysisWriter.write(result.getSourceFile() + "\t" + result.getAnalysisResult() + "\t" + result.getAnalysisValue() + "\t" + result.getPositiveProbability() + System.lineSeparator());
             }
