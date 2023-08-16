@@ -1,4 +1,4 @@
-package eu.kwrhannover.jufo.metag;
+package eu.kwrhannover.jufo.alethieg;
 
 import cern.colt.list.DoubleArrayList;
 
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
 
-import static eu.kwrhannover.jufo.metag.MetaG.maxPositions;
+import static eu.kwrhannover.jufo.alethieg.AlethieG.maxPositions;
 
 public class ParseCSV {
     //TODO Detection of decimal point

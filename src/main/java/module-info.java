@@ -1,8 +1,4 @@
-module eu.kwrhannover.jufo.metag {
-    requires javafx.controls;
-    requires javafx.fxml;
+module eu.kwrhannover.jufo.alethieg {
     requires colt;
-
-    opens eu.kwrhannover.jufo.metag to javafx.fxml;
-    exports eu.kwrhannover.jufo.metag;
+    exports eu.kwrhannover.jufo.alethieg;
 }
