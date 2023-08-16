@@ -23,6 +23,7 @@ import static java.nio.file.Files.isRegularFile;
 import static java.util.Locale.ROOT;
 import static java.util.stream.Collectors.joining;
 
+// wrapper class for whole programm
 public class AlethieG {
     private static Path path = AlethieGSettings.getDirectory();
     public static int maxPositions = AlethieGSettings.getMaxPositions(); //Maximum number of positions
@@ -41,13 +42,15 @@ public class AlethieG {
     public void execute(final Consumer<Double> updateProgress) throws IOException {
         System.out.println("Start ...");
 
-        //prints java version
+        // prints java version
         double version = Double.parseDouble(System.getProperty("java.specification.version"));
         System.out.println("Java version: " + version);
-
+        
+        // prints directory where alethieG is being executed
         path = AlethieGSettings.getDirectory();
-        System.out.println("Path: " + path);
+        System.out.println("Current Path: " + path);
 
+        // getting settings
         boolean svgOutput = AlethieGSettings.getSVGOutput();
         maxPositions = AlethieGSettings.getMaxPositions();
         barCount = AlethieGSettings.getBarCount();
@@ -56,6 +59,7 @@ public class AlethieG {
 
         List<Path> paths = getPaths();
 
+        // collects files in directory
         System.out.println("Files to be processed(" + paths.size() + "): " + paths.stream()
                 .map(Path::toString)
                 .collect(joining(lineSeparator() + "    ", lineSeparator() + "    ", "")));
@@ -65,9 +69,10 @@ public class AlethieG {
             Analysis analysis = new Analysis(path);
             boolean check = path.toString().endsWith(".csv");
             if (check) {
+                // process file and create result
                 try {
                     final DoubleArrayList positions = parseCSV(path);
-                    System.out.println(positions.size());
+                    System.out.println("Amount Positions: " + positions.size());    // how many entries the file has
 
                     final long distanceCount = ((long) positions.size() * (positions.size() - 1)) / 2;
 
@@ -79,7 +84,7 @@ public class AlethieG {
                     Result result = analysis.analyseDistances(scaledBars);
                     results.add(result);
 
-
+                    // create SVG
                     if (svgOutput) {
                         final Path targetFile = createTargetFilename(path);
                         deleteFile(targetFile);
@@ -99,7 +104,7 @@ public class AlethieG {
             out.println("No CSV files found");
         } else {
             if (results.size() == 1) {
-                analysisFile = Paths.get(AlethieGSettings.getDirectory() + File.separator + "AlethieG_" + cutFileExtension(results.get(0).getSourceFile().getFileName()) + "_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
+                analysisFile = Paths.get(AlethieGSettings.getDirectory() + File.separator + "AlethieG_analysis_" + cutFileExtension(results.get(0).getSourceFile().getFileName()) + "_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
             } else {
                 analysisFile = Paths.get(AlethieGSettings.getDirectory() + File.separator + "AlethieG_analysis_" + maxPositions + "pos_res" + barCount + ".txt");
             }
@@ -113,7 +118,8 @@ public class AlethieG {
     private static List<Path> getPaths() {
         int depth;
         if (browseSubfolders) {
-            depth = Integer.MAX_VALUE;
+            //depth = Integer.MAX_VALUE;  // why would you do that? https://stackoverflow.com/questions/15516816/what-is-the-maximum-allowed-depth-of-sub-folders 
+            depth = 10;
         } else {
             depth = 1;
         }

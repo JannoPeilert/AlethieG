@@ -27,7 +27,7 @@ public enum Settings {
     }
 
     public static class Defaults {
-        static final Path DIRECTORY = Paths.get("/mnt/ngsnfs/gen/rcug_lw/Janno/WochenendeMetaG/playground_new/growth_rate");  //System.getProperty("user.home", ".") TODO: change back
+        static final Path DIRECTORY = Paths.get(System.getProperty("user.home", "."));
         static final boolean BROWSE_SUBFOLDERS = false;
         static final int BAR_COUNT = 50;
         static final int MAX_POSITIONS = 10000;
